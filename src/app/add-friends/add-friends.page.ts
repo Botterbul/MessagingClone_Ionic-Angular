@@ -42,9 +42,7 @@ export class AddFriendsPage implements OnInit {
       this.relevantUser = [];
       this.listedUsers = [];
       this.onFilterUpdate();
-      console.log(this.users);
     });
-    console.log(this.users);
   }
 
   onFilterUpdate() {
