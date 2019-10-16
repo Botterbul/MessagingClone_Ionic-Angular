@@ -19,7 +19,7 @@
               <ion-list *ngIf="!isLoadingUsers">
                 <ion-item-sliding *ngFor="let user of relevantUser" #slidingItem>
                   <div *ngFor="let friend of user.friends">
-                      <ion-item lines="none">
+                      <ion-item lines="none" (click)="onClickUser(friend.userID)">
                       <ion-avatar slot="start">
                       <!-- <ion-img [src]="book.imageURL"></ion-img> -->
                       </ion-avatar>    

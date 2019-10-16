@@ -64,6 +64,10 @@ export class CurrentFriendsPage implements OnInit {
     });
   }
 
+  onClickUser(userID: string) {
+    this.router.navigate(['/', 'chat-form', userID]);
+  }
+
   onDeleteRequest(userID: string, slidingItem: IonItemSliding) {
     slidingItem.close();
     this.loadingCtrl.create({ message: 'Declining Invitation...' }).then(loadingEl => {
