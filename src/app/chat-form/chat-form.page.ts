@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { NavController } from '@ionic/angular';
+import { NavController, LoadingController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { UserService } from '../user.service';
 import { User } from '../user.model';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { MessageService } from '../message.service';
+import { Message } from '../message.model';
 
 @Component({
   selector: 'app-chat-form',
@@ -23,12 +25,17 @@ export class ChatFormPage implements OnInit {
   friendName: string;
   form: FormGroup;
   message: string;
+  loadedMessages: Message[];
+  private messageSub: Subscription;
+  relevantMessages: Message[];
 
   constructor(
     private router: Router,
     private navCtrl: NavController,
     private route: ActivatedRoute,
-    private userService: UserService
+    private userService: UserService,
+    private messageService: MessageService,
+    private loadingCtrl: LoadingController
     ) { }
 
   ngOnInit() {
@@ -57,6 +64,23 @@ export class ChatFormPage implements OnInit {
       );
       this.friendName = this.relevantFriendUser[0].email;
     });
+    this.messageSub = this.messageService.messages.subscribe(messages => {
+      this.loadedMessages = messages;
+      this.relevantMessages = this.loadedMessages.filter(
+        message => message.fromUser === this.user_ID || message.fromUser === this.userID
+      );
+    });
+    // Moet dalk hier die if skryf om te wys watter kant is boodskap
+  }
+
+  ionViewWillEnter() {
+    this.isLoading = true;
+    this.messageService.fetchMessages().subscribe(() => {
+      this.isLoading = false;
+    });
+    this.userService.fetchUsers().subscribe(() => {
+      this.isLoading = false;
+    });
   }
 
   getUserID() {
@@ -66,7 +90,33 @@ export class ChatFormPage implements OnInit {
   }
 
   sendMessage() {
+    this.loadingCtrl
+      .create({
+        message: 'Sending message...'
+      })
+      .then(loadingEl => {
+        loadingEl.present();
+        this.messageService
+          .addMessage(
+            this.user_ID,
+            this.userID,
+            this.form.value.message,
+            '',
+            true)
+            .subscribe(() => {
+            loadingEl.dismiss();
+            this.form.reset();
+        });
+      });
+  }
 
+  ngOnDestroy() {
+    if (this.messageSub) {
+      this.messageSub.unsubscribe();
+    }
+    if (this.usersSub) {
+      this.usersSub.unsubscribe();
+    }
   }
 
 }

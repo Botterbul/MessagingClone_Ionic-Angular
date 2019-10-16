@@ -73,7 +73,11 @@ export class MessageService {
   }
 
   addMessage(
-    fromUser: string, toUser: string, message: string, documentURL: string, sentUser: boolean
+    fromUser: string,
+    toUser: string,
+    message: string,
+    documentURL: string,
+    sentUser: boolean
   ) {
     let generatedId: string;
     let fetchedUserId: string;
