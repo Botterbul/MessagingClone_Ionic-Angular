@@ -168,7 +168,7 @@ export class UserService {
     );
   }
 
-  acceptFriendInvitation(userId: string, newFriendEmail: string, newFriendUserID: string) {
+  acceptFriendInvitation(userId: string, userEmail: string, newFriendEmail: string, newFriendUserID: string) {
     let updatedUser: User[];
     let fetchedToken: string;
     return this.authService.token.pipe(
@@ -186,6 +186,7 @@ export class UserService {
         }
       }),
       switchMap(users => {
+        this.acceptFriendInvitation2(userId, userEmail, newFriendUserID);
         const updatedUserIndex = users.findIndex(pl => pl.id === userId);
         updatedUser = [...users];
         const oldUser = updatedUser[updatedUserIndex];
@@ -206,6 +207,54 @@ export class UserService {
         );
         return this.http.put(
           `https://stratos-ad2db.firebaseio.com/users/${userId}.json?auth=${fetchedToken}`,
+          { ...updatedUser[updatedUserIndex], id: null }
+        );
+      }),
+      tap(() => {
+        this._users.next(updatedUser);
+      })
+    );
+  }
+
+  acceptFriendInvitation2(userId: string, userEmailPerson: string, newFriendUserID: string) {
+    let updatedUser: User[];
+    let fetchedToken: string;
+    console.log('Tweede Method');
+    return this.authService.token.pipe(
+      take(1),
+      switchMap(token => {
+        fetchedToken = token;
+        return this.users;
+      }),
+      take(1),
+      switchMap(users => {
+        if (!users || users.length <= 0) {
+          return this.fetchUsers();
+        } else {
+          return of(users);
+        }
+      }),
+      switchMap(users => {
+        const updatedUserIndex = users.findIndex(pl => pl.id === newFriendUserID);
+        updatedUser = [...users];
+        const oldUser = updatedUser[updatedUserIndex];
+        this.oldFriendsPending = oldUser.friendsPending;
+        this.newFriendsList = oldUser.friends;
+        this.newFriendsPending = this.oldFriendsPending.filter(
+          user => user.userID !== userId
+        );
+        const newUser = {userEmail: userEmailPerson, userID: userId};
+        this.newFriendsList.push(newUser);
+        updatedUser[updatedUserIndex] = new User(
+          oldUser.id,
+          oldUser.email,
+          this.newFriendsList,
+          this.newFriendsPending,
+          oldUser.userId,
+          oldUser.profilePicture
+        );
+        return this.http.put(
+          `https://stratos-ad2db.firebaseio.com/users/${newFriendUserID}.json?auth=${fetchedToken}`,
           { ...updatedUser[updatedUserIndex], id: null }
         );
       }),
@@ -243,6 +292,7 @@ export class UserService {
         }
       }),
       switchMap(users => {
+        this.deleteFriend2(userId, newFriendUserID);
         const updatedUserIndex = users.findIndex(pl => pl.id === userId);
         updatedUser = [...users];
         const oldUser = updatedUser[updatedUserIndex];
@@ -260,6 +310,50 @@ export class UserService {
         );
         return this.http.put(
           `https://stratos-ad2db.firebaseio.com/users/${userId}.json?auth=${fetchedToken}`,
+          { ...updatedUser[updatedUserIndex], id: null }
+        );
+      }),
+      tap(() => {
+        this._users.next(updatedUser);
+      })
+    );
+  }
+
+  deleteFriend2(userId: string, newFriendUserID: string) {
+    let updatedUser: User[];
+    let fetchedToken: string;
+    return this.authService.token.pipe(
+      take(1),
+      switchMap(token => {
+        fetchedToken = token;
+        return this.users;
+      }),
+      take(1),
+      switchMap(users => {
+        if (!users || users.length <= 0) {
+          return this.fetchUsers();
+        } else {
+          return of(users);
+        }
+      }),
+      switchMap(users => {
+        const updatedUserIndex = users.findIndex(pl => pl.id === newFriendUserID);
+        updatedUser = [...users];
+        const oldUser = updatedUser[updatedUserIndex];
+        this.oldFriendsList = oldUser.friends;
+        this.newFriendsList = this.oldFriendsList.filter(
+          user => user.userID !== userId
+        );
+        updatedUser[updatedUserIndex] = new User(
+          oldUser.id,
+          oldUser.email,
+          this.newFriendsList,
+          oldUser.friendsPending,
+          oldUser.userId,
+          oldUser.profilePicture
+        );
+        return this.http.put(
+          `https://stratos-ad2db.firebaseio.com/users/${newFriendUserID}.json?auth=${fetchedToken}`,
           { ...updatedUser[updatedUserIndex], id: null }
         );
       }),

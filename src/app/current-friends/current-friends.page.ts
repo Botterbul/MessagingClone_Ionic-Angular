@@ -85,7 +85,7 @@ export class CurrentFriendsPage implements OnInit {
       this.relevantFriendUser = this.loadedUsers.filter(
         user => user.userId === userID
       );
-      this.userService.acceptFriendInvitation(this.relevantUser[0].id, this.relevantFriendUser[0].email, userID).subscribe(() => {
+      this.userService.acceptFriendInvitation(this.relevantUser[0].id, this.relevantUser[0].email, this.relevantFriendUser[0].email, userID).subscribe(() => {
         loadingEl.dismiss();
       });
     });

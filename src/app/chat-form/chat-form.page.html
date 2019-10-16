@@ -7,10 +7,10 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content text-center>
-  <div>
+<ion-content>
+  <div *ngIf="isLoading" text-center>
     <br>
-    <ion-spinner *ngIf="isLoading"></ion-spinner>
+    <ion-spinner></ion-spinner>
   </div>
   <ion-grid *ngIf="!isLoading">
     <ion-row>
