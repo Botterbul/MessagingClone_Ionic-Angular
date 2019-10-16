@@ -5,6 +5,7 @@ import { LoadingController, AlertController } from '@ionic/angular';
 import { Observable } from 'rxjs';
 
 import { AuthService, AuthResponseData } from './auth.service';
+import { UserService } from '../user.service';
 
 @Component({
   selector: 'app-auth',
@@ -21,7 +22,8 @@ export class AuthPage implements OnInit {
     private authService: AuthService,
     private router: Router,
     private loadingCtrl: LoadingController,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private usersService: UserService
   ) { }
 
   ngOnInit() {}
@@ -43,6 +45,7 @@ export class AuthPage implements OnInit {
             this.isLoading = false;
             loadingEl.dismiss();
             if (!this.isLogin) {
+              this.firstTimeCreateUser();
               this.router.navigateByUrl('/auth');
             } else {
               this.router.navigateByUrl('/home');
@@ -96,6 +99,21 @@ export class AuthPage implements OnInit {
 
   showHideConditions() {
     this.showConditions = !this.showConditions;
+  }
+
+  firstTimeCreateUser() {
+    this.loadingCtrl
+      .create({
+        message: 'First time setup. You can now login!'
+      })
+      .then(loadingEl => {
+        loadingEl.present();
+        this.usersService
+          .addUser()
+          .subscribe(() => {
+            loadingEl.dismiss();
+          });
+      });
   }
 
 }

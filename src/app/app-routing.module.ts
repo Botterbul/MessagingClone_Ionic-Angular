@@ -11,7 +11,10 @@ const routes: Routes = [
     canLoad: [AuthGuard]
   },
   { path: 'proxies', loadChildren: './proxies/proxies.module#ProxiesPageModule', canLoad: [AuthGuard] },
-  { path: 'profile', loadChildren: './profile/profile.module#ProfilePageModule', canLoad: [AuthGuard] }
+  { path: 'profile', loadChildren: './profile/profile.module#ProfilePageModule', canLoad: [AuthGuard] },
+  { path: 'chat-form', loadChildren: './chat-form/chat-form.module#ChatFormPageModule' },
+  { path: 'add-friends', loadChildren: './add-friends/add-friends.module#AddFriendsPageModule' },
+  { path: 'current-friends', loadChildren: './current-friends/current-friends.module#CurrentFriendsPageModule' }
 ];
 
 @NgModule({

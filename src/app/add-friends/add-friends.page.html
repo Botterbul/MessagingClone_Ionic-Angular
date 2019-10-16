@@ -1,0 +1,32 @@
+<ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/home"></ion-back-button>
+      </ion-buttons>
+      <ion-title>Add Friends</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+<ion-content text-center size-sm="6" offset-sm="3">
+  <div *ngIf="isLoading">
+    <br>
+    <ion-spinner></ion-spinner>
+  </div>
+  <ion-card *ngIf="!isLoading">
+    <ion-card-header>
+      <ion-card-title>User's E-Mail:</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <form [formGroup]="form">
+        <ion-item lines="none">
+          <ion-label position="floating">E-mail</ion-label>
+          <ion-textarea [(ngModel)]="email" formControlName="email"></ion-textarea>
+        </ion-item>
+      </form>
+      <ion-button type="button" fill="outline" expand="block" (click)="addFriend()">
+        Add Friend
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
+
