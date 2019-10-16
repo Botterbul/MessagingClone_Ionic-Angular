@@ -51,13 +51,14 @@ export class CurrentFriendsPage implements OnInit {
     });
   }
 
-  onDeleteFriend(friendId: string, slidingItem: IonItemSliding) {
+  onDeleteFriend(userID: string, slidingItem: IonItemSliding) {
     slidingItem.close();
-    console.log(this.relevantUser[0].id);
-    console.log(friendId);
     this.loadingCtrl.create({ message: 'Deleting Friend...' }).then(loadingEl => {
       loadingEl.present();
-      this.userService.deleteFriend(this.relevantUser[0].id, friendId).subscribe(() => {
+      this.relevantFriendUser = this.loadedUsers.filter(
+        user => user.userId === userID
+      );
+      this.userService.deleteFriend(this.relevantUser[0].id, userID).subscribe(() => {
         loadingEl.dismiss();
       });
     });
@@ -77,11 +78,9 @@ export class CurrentFriendsPage implements OnInit {
     slidingItem.close();
     this.loadingCtrl.create({ message: 'Accepting Invitation...' }).then(loadingEl => {
       loadingEl.present();
-
       this.relevantFriendUser = this.loadedUsers.filter(
         user => user.userId === userID
       );
-
       this.userService.acceptFriendInvitation(this.relevantUser[0].id, this.relevantFriendUser[0].email, userID).subscribe(() => {
         loadingEl.dismiss();
       });

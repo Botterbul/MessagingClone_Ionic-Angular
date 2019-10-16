@@ -225,7 +225,7 @@ export class UserService {
     );
   }
 
-  deleteFriend(userId: string, friendId: string) {
+  deleteFriend(userId: string, newFriendUserID: string) {
     let updatedUser: User[];
     let fetchedToken: string;
     return this.authService.token.pipe(
@@ -248,7 +248,7 @@ export class UserService {
         const oldUser = updatedUser[updatedUserIndex];
         this.oldFriendsList = oldUser.friends;
         this.newFriendsList = this.oldFriendsList.filter(
-          user => user !== friendId
+          user => user.userID !== newFriendUserID
         );
         updatedUser[updatedUserIndex] = new User(
           oldUser.id,
