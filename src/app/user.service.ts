@@ -168,7 +168,7 @@ export class UserService {
     );
   }
 
-  acceptFriendInvitation(userId: string, newFriendEmail: string) {
+  acceptFriendInvitation(userId: string, newFriendEmail: string, newFriendUserID: string) {
     let updatedUser: User[];
     let fetchedToken: string;
     return this.authService.token.pipe(
@@ -192,9 +192,10 @@ export class UserService {
         this.oldFriendsPending = oldUser.friendsPending;
         this.newFriendsList = oldUser.friends;
         this.newFriendsPending = this.oldFriendsPending.filter(
-          user => user !== newFriendEmail
+          user => user.userID !== newFriendUserID
         );
-        this.newFriendsList.push(newFriendEmail);
+        const newUser = {userEmail: newFriendEmail, userID: newFriendUserID};
+        this.newFriendsList.push(newUser);
         updatedUser[updatedUserIndex] = new User(
           oldUser.id,
           oldUser.email,

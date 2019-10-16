@@ -17,6 +17,7 @@ export class CurrentFriendsPage implements OnInit {
   relevantUser: User[];
   relevantUserPendingFriends: string[];
   relevantUserFriends: string[];
+  relevantFriendUser: User[];
   private usersSub: Subscription;
   public user_ID: string;
   friend: string;
@@ -77,9 +78,11 @@ export class CurrentFriendsPage implements OnInit {
     this.loadingCtrl.create({ message: 'Accepting Invitation...' }).then(loadingEl => {
       loadingEl.present();
 
-      
+      this.relevantFriendUser = this.loadedUsers.filter(
+        user => user.userId === userID
+      );
 
-      this.userService.acceptFriendInvitation(this.relevantUser[0].id, userID).subscribe(() => {
+      this.userService.acceptFriendInvitation(this.relevantUser[0].id, this.relevantFriendUser[0].email, userID).subscribe(() => {
         loadingEl.dismiss();
       });
     });
