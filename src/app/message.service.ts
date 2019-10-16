@@ -4,7 +4,6 @@ import { take, map, tap, switchMap } from 'rxjs/operators';
 import { Message } from './message.model';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from './auth/auth.service';
-import { triggerAsyncId } from 'async_hooks';
 
 interface MessagesData {
   fromUser: string;

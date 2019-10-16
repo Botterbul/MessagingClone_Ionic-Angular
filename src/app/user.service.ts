@@ -214,6 +214,16 @@ export class UserService {
     );
   }
 
+  retrieveUserEmail() {
+    return this.authService.userEmail.pipe(
+      take(1),
+      switchMap(userEmail => {
+        this.user_Students = userEmail;
+        return this.user_Students = userEmail;
+      })
+    );
+  }
+
   deleteFriend(userId: string, friendId: string) {
     let updatedUser: User[];
     let fetchedToken: string;
@@ -281,7 +291,7 @@ export class UserService {
         const oldUser = updatedUser[updatedUserIndex];
         this.oldFriendsPending = oldUser.friendsPending;
         this.newFriendsPending = this.oldFriendsPending.filter(
-          user => user !== friendId
+          user => user.userID !== friendId
         );
         updatedUser[updatedUserIndex] = new User(
           oldUser.id,

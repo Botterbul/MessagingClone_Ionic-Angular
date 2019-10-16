@@ -19,6 +19,7 @@ export class CurrentFriendsPage implements OnInit {
   relevantUserFriends: string[];
   private usersSub: Subscription;
   public user_ID: string;
+  friend: string;
 
   constructor(
     private userService: UserService,
@@ -61,25 +62,24 @@ export class CurrentFriendsPage implements OnInit {
     });
   }
 
-  onDeleteRequest(friendId: string, slidingItem: IonItemSliding) {
+  onDeleteRequest(userID: string, slidingItem: IonItemSliding) {
     slidingItem.close();
-    console.log(this.relevantUser[0].id);
-    console.log(friendId);
     this.loadingCtrl.create({ message: 'Declining Invitation...' }).then(loadingEl => {
       loadingEl.present();
-      this.userService.deleteFriendInvitation(this.relevantUser[0].id, friendId).subscribe(() => {
+      this.userService.deleteFriendInvitation(this.relevantUser[0].id, userID).subscribe(() => {
         loadingEl.dismiss();
       });
     });
   }
 
-  onAccept(friendId: string, slidingItem: IonItemSliding) {
+  onAccept(userID: string, slidingItem: IonItemSliding) {
     slidingItem.close();
-    console.log(this.relevantUser[0].id);
-    console.log(friendId);
     this.loadingCtrl.create({ message: 'Accepting Invitation...' }).then(loadingEl => {
       loadingEl.present();
-      this.userService.acceptFriendInvitation(this.relevantUser[0].id, friendId).subscribe(() => {
+
+      
+
+      this.userService.acceptFriendInvitation(this.relevantUser[0].id, userID).subscribe(() => {
         loadingEl.dismiss();
       });
     });

@@ -14,6 +14,7 @@ import { AuthService } from '../auth/auth.service';
 })
 export class AddFriendsPage implements OnInit {
   form: FormGroup;
+  email: string;
   private usersSub: Subscription;
   users: User[];
   relevantUser: User[];
@@ -58,6 +59,7 @@ export class AddFriendsPage implements OnInit {
   }
 
   addFriend() {
+    this.userToBeAdded = [];
     this.userToBeAdded = this.users.filter(
       user => user.email === this.form.value.email
     );
@@ -79,9 +81,9 @@ export class AddFriendsPage implements OnInit {
         loadingEl.present();
         this.userService
           .addFriend(
-            this.relevantUser[0].id,
-            this.form.value.email,
-            this.userToBeAdded[0].userId
+            this.userToBeAdded[0].id,
+            this.relevantUser[0].email,
+            this.relevantUser[0].userId
           )
           // tslint:disable-next-line: align
           .subscribe(() => {
