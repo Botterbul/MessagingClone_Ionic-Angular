@@ -4,6 +4,7 @@ import { UserService } from '../user.service';
 import { User } from '../user.model';
 import { IonItemSliding, LoadingController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { MessageService } from '../message.service';
 
 @Component({
   selector: 'app-current-friends',
@@ -25,7 +26,8 @@ export class CurrentFriendsPage implements OnInit {
   constructor(
     private userService: UserService,
     private router: Router,
-    private loadingCtrl: LoadingController
+    private loadingCtrl: LoadingController,
+    private messageService: MessageService
     ) { }
 
   ngOnInit() {
@@ -59,7 +61,9 @@ export class CurrentFriendsPage implements OnInit {
         user => user.userId === userID
       );
       this.userService.deleteFriend(this.relevantUser[0].id, userID).subscribe(() => {
-        loadingEl.dismiss();
+        this.userService.deleteFriend(userID, this.relevantUser[0].userId).subscribe(() => {
+          loadingEl.dismiss();
+        });
       });
     });
   }
@@ -85,9 +89,27 @@ export class CurrentFriendsPage implements OnInit {
       this.relevantFriendUser = this.loadedUsers.filter(
         user => user.userId === userID
       );
-      this.userService.acceptFriendInvitation(this.relevantUser[0].id, this.relevantUser[0].email, this.relevantFriendUser[0].email, userID).subscribe(() => {
-        loadingEl.dismiss();
-      });
+      this.messageService
+          .addFirstMessage(
+            this.relevantUser[0].userId,
+            this.relevantUser[0].email,
+            this.relevantFriendUser[0].userId,
+            this.relevantFriendUser[0].email
+            ).subscribe(() => {
+              this.userService.acceptFriendInvitation(
+                this.relevantUser[0].id,
+                this.relevantUser[0].email,
+                this.relevantFriendUser[0].email,
+                userID).subscribe(() => {
+                  this.userService.acceptFriendInvitation(
+                    this.relevantFriendUser[0].id,
+                    this.relevantFriendUser[0].email,
+                    this.relevantUser[0].email,
+                    this.relevantUser[0].userId).subscribe(() => {
+                    loadingEl.dismiss();
+                  });
+              });
+            });
     });
   }
 

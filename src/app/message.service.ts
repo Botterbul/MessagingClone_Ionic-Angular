@@ -7,6 +7,7 @@ import { AuthService } from './auth/auth.service';
 
 interface MessagesData {
   fromUser: string;
+  fromUserEmail: string;
   toUser: string;
   toUserEmail: string;
   message: [];
@@ -42,6 +43,7 @@ export class MessageService {
             new Message(
               key,
               resData[key].fromUser,
+              resData[key].fromUserEmail,
               resData[key].toUser,
               resData[key].toUserEmail,
               resData[key].message
@@ -69,9 +71,6 @@ export class MessageService {
 
   addMessage(
     messageID: string,
-    fromUser: string,
-    toUser: string,
-    toUserEmail: string,
     message: string,
     documentURL: string,
     sentUser: boolean
@@ -103,9 +102,10 @@ export class MessageService {
         this.newMessageList.push(newMessageItem);
         updatedMessage[updatedMessageIndex] = new Message(
           oldMessage.id,
-          fromUser,
-          toUser,
-          toUserEmail,
+          oldMessage.fromUser,
+          oldMessage.fromUserEmail,
+          oldMessage.toUser,
+          oldMessage.toUserEmail,
           this.newMessageList
         );
         return this.http.put(
@@ -115,6 +115,53 @@ export class MessageService {
       }),
       tap(() => {
         this._messages.next(updatedMessage);
+      })
+    );
+  }
+
+  addFirstMessage(
+    fromUser: string,
+    fromUserEmail: string,
+    toUser: string,
+    toUserEmail: string,
+  ) {
+    let generatedId: string;
+    let fetchedUserId: string;
+    let newMessage: Message;
+    return this.authService.userId.pipe(
+      take(1),
+      switchMap(userId => {
+        fetchedUserId = userId;
+        return this.authService.token;
+      }),
+      take(1),
+      switchMap(token => {
+        if (!fetchedUserId) {
+          throw new Error('No user found!');
+        }
+        newMessage = new Message(
+          Math.random().toString(),
+          fromUser,
+          fromUserEmail,
+          toUser,
+          toUserEmail,
+          []
+        );
+        return this.http.post<{name: string}>(
+          `https://stratos-ad2db.firebaseio.com/messages.json?auth=${token}`,
+          {
+            ...newMessage,
+            id: null
+          }
+        );
+      }), switchMap(resData => {
+        generatedId = resData.name;
+        return this.messages;
+      }),
+      take(1),
+      tap(messages => {
+        newMessage.id = generatedId;
+        this._messages.next(messages.concat(newMessage));
       })
     );
   }

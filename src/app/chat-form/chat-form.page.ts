@@ -177,9 +177,6 @@ export class ChatFormPage implements OnInit {
         this.messageService
           .addMessage(
             this.relevantMessages[0].id,
-            this.user_ID,
-            this.userID,
-            this.friendName,
             this.form.value.message,
             '',
             true
