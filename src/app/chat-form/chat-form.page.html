@@ -23,10 +23,8 @@
       <ion-col size="12">
         <ion-list>
           <ion-item *ngFor="let message of messagesBetweenUsers">
-            <div *ngIf="message.message !== 'Download FILE#*-199'">
-              <ion-label *ngIf="message.emailSent === myEmail" text-right> {{ message.message }} </ion-label>
-              <ion-label *ngIf="message.emailSent !== myEmail" text-left> {{ message.message }} </ion-label>
-            </div>
+            <ion-label *ngIf="message.emailSent === myEmail && message.message !== 'Download FILE#*-199'" text-right> {{ message.message }} </ion-label>
+            <ion-label *ngIf="message.emailSent !== myEmail && message.message !== 'Download FILE#*-199'" text-left> {{ message.message }} </ion-label>
             <div *ngIf="message.message === 'Download FILE#*-199'">
               <p>File attached:</p>
               <ion-button (click)="downloadFileUrl(message.documentURL)">
