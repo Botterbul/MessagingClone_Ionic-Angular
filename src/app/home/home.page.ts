@@ -43,7 +43,6 @@ export class HomePage {
     });
     this.messageSub = this.messageService.messages.subscribe(messages => {
       this.loadedMessages = messages;
-      console.log(this.user_ID);
       this.relevantMessages = this.loadedMessages.filter(
         message => message.fromUser === this.user_ID || message.toUser === this.user_ID
       );

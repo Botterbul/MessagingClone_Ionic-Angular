@@ -22,30 +22,16 @@
   </div>
   <ion-grid *ngIf="!isLoading">
     <ion-row>
-        <div *ngIf="!isLoading">
-          <ion-list class="itemList" no-padding>
-            <ion-col size="12">
-              <ion-item *ngFor="let message of messagesBetweenUsers">
-                <ion-label>
-                  <h4>{{ message.message }}</h4>
-                </ion-label>
-              </ion-item>
-            </ion-col>
-          </ion-list>
-        </div>
-    </ion-row>
-  </ion-grid>
-  <ion-grid style="position: fixed;bottom: 0;width:100%" *ngIf="!isLoading">
-    <ion-row>
-      <ion-col>
-        <ion-col size="2" text-center>
-          <form [formGroup]="form2">
-            <app-image-picker (imagePick)="onImagePicked($event)" [showPreview]="form2.get('image').value"></app-image-picker>
-          </form>
-        </ion-col>
+      <ion-col size="12">
+        <ion-list>
+          <ion-item *ngFor="let message of messagesBetweenUsers">
+            <ion-label *ngIf="message.emailSent === myEmail" text-right> {{ message.message }} </ion-label>
+            <ion-label *ngIf="message.emailSent !== myEmail" text-left> {{ message.message }} </ion-label>
+          </ion-item>
+        </ion-list>
       </ion-col>
     </ion-row>
-    <ion-row>
+    <ion-row style="bottom: 0px;">
       <ion-col size="8">
         <form [formGroup]="form">
           <ion-input [(ngModel)]="message" formControlName="message" style="border-style: solid;border-width: 1px;"></ion-input>

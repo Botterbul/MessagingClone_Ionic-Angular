@@ -73,12 +73,11 @@ export class MessageService {
     messageID: string,
     message: string,
     documentURL: string,
-    sentUser: boolean
+    sentUser: boolean,
+    emailSent: string
   ) {
-
     let updatedMessage: Message[];
     let fetchedToken: string;
-    console.log('Tweede Method');
     return this.authService.token.pipe(
       take(1),
       switchMap(token => {
@@ -97,7 +96,7 @@ export class MessageService {
         const updatedMessageIndex = messages.findIndex(pl => pl.id === messageID);
         updatedMessage = [...messages];
         const oldMessage = updatedMessage[updatedMessageIndex];
-        const newMessageItem = {message: message, documentURL: documentURL, sentUser: sentUser};
+        const newMessageItem = {message: message, documentURL: documentURL, sentUser: sentUser, emailSent: emailSent};
         this.newMessageList = oldMessage.message;
         this.newMessageList.push(newMessageItem);
         updatedMessage[updatedMessageIndex] = new Message(

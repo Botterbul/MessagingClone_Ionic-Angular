@@ -7,6 +7,7 @@ import { User } from '../user.model';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MessageService } from '../message.service';
 import { Message } from '../message.model';
+import { SimpleCrypto } from "simple-crypto-js";
 
 function base64toBlob(base64Data, contentType) {
   contentType = contentType || '';
@@ -47,11 +48,15 @@ export class ChatFormPage implements OnInit {
   public user_ID: string;
   friendName: string;
   message: string;
-  messagesBetweenUsers: Message[];
+  messagesBetweenUsers = [];
   checkMessages = false;
   loadedMessages: Message[];
   private messageSub: Subscription;
   relevantMessages: Message[];
+  private _secretKey = "HASH";
+  myEmail: string;
+  checkMyEmail: string;
+  simpleCrypto = new SimpleCrypto(this._secretKey);
 
   constructor(
     private router: Router,
@@ -90,6 +95,7 @@ export class ChatFormPage implements OnInit {
         user => user.userId === this.userID
       );
       this.friendName = this.relevantFriendUser[0].email;
+      this.myEmail = this.relevantUser[0].email;
     });
     this.messageSub = this.messageService.messages.subscribe(messages => {
       this.loadedMessages = messages;
@@ -97,8 +103,16 @@ export class ChatFormPage implements OnInit {
         message => (message.fromUser === this.user_ID && message.toUser === this.userID) || (message.fromUser === this.userID && message.toUser === this.user_ID)
       );
       this.messagesBetweenUsers = this.relevantMessages[0].message;
+      this.checkMyEmail = this.relevantMessages[0].fromUserEmail;
+      /*
+      var i;
+      for (i = 0; i < this.messagesBetweenUsers.length; i++) {
+        let decipherText = this.simpleCrypto.decrypt(this.messagesBetweenUsers[i].message);
+        this.messagesBetweenUsers[i].message = decipherText;
+        console.log(this.messagesBetweenUsers[i].message);
+      }
+      */
     });
-    // Moet dalk hier die if skryf om te wys watter kant is boodskap
   }
 
   onImagePicked(imageData: string | File) {
@@ -176,12 +190,15 @@ export class ChatFormPage implements OnInit {
       })
       .then(loadingEl => {
         loadingEl.present();
+        //let cipherText = this.simpleCrypto.encrypt(this.form.value.message);
+
         this.messageService
           .addMessage(
             this.relevantMessages[0].id,
             this.form.value.message,
             '',
-            true
+            true,
+            this.myEmail
             )
             .subscribe(() => {
             loadingEl.dismiss();

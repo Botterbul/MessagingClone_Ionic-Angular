@@ -11,10 +11,6 @@ const routes: Routes = [
     canLoad: [AuthGuard]
   },
   {
-    path: 'proxies',
-    loadChildren: './proxies/proxies.module#ProxiesPageModule',
-    canLoad: [AuthGuard] },
-  {
     path: 'profile',
     loadChildren: './profile/profile.module#ProfilePageModule',
     canLoad: [AuthGuard] },
