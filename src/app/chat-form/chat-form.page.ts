@@ -100,9 +100,11 @@ export class ChatFormPage implements OnInit {
           .addMessage(
             this.user_ID,
             this.userID,
+            this.friendName,
             this.form.value.message,
             '',
-            true)
+            true
+            )
             .subscribe(() => {
             loadingEl.dismiss();
             this.form.reset();

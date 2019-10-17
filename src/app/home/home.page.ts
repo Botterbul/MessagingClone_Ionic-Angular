@@ -47,7 +47,7 @@ export class HomePage {
   }
 
   onClickChat() {
-
+    this.router.navigate(['/', 'chat-form', this.relevantMessages[0].toUser]);
   }
 
   onDelete(messageID: string, slidingItem: IonItemSliding) {

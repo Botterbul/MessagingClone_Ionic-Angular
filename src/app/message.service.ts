@@ -8,6 +8,7 @@ import { AuthService } from './auth/auth.service';
 interface MessagesData {
   fromUser: string;
   toUser: string;
+  toUserEmail: string;
   message: string;
   documentURL: string;
   sentUser: boolean;
@@ -45,6 +46,7 @@ export class MessageService {
               key,
               resData[key].fromUser,
               resData[key].toUser,
+              resData[key].toUserEmail,
               resData[key].message,
               resData[key].documentURL,
               resData[key].sentUser,
@@ -75,6 +77,7 @@ export class MessageService {
   addMessage(
     fromUser: string,
     toUser: string,
+    toUserEmail: string,
     message: string,
     documentURL: string,
     sentUser: boolean
@@ -98,6 +101,7 @@ export class MessageService {
           Math.random().toString(),
           fromUser,
           toUser,
+          toUserEmail,
           message,
           documentURL,
           sentUser,
