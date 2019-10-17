@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject} from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { take, map, tap, switchMap } from 'rxjs/operators';
 import { Message } from './message.model';
 import { HttpClient } from '@angular/common/http';
@@ -9,11 +9,7 @@ interface MessagesData {
   fromUser: string;
   toUser: string;
   toUserEmail: string;
-  message: string;
-  documentURL: string;
-  sentUser: boolean;
-  receivedUser: boolean;
-  readUser: boolean;
+  message: [];
 }
 
 @Injectable({
@@ -22,6 +18,7 @@ interface MessagesData {
 export class MessageService {
   private _messages = new BehaviorSubject<Message[]>([]);
   public user_Students: string;
+  private newMessageList = [];
 
   get messages() {
     return this._messages.asObservable();
@@ -47,11 +44,7 @@ export class MessageService {
               resData[key].fromUser,
               resData[key].toUser,
               resData[key].toUserEmail,
-              resData[key].message,
-              resData[key].documentURL,
-              resData[key].sentUser,
-              resData[key].receivedUser,
-              resData[key].readUser
+              resData[key].message
             )
           );
         }
@@ -75,6 +68,7 @@ export class MessageService {
   }
 
   addMessage(
+    messageID: string,
     fromUser: string,
     toUser: string,
     toUserEmail: string,
@@ -82,47 +76,45 @@ export class MessageService {
     documentURL: string,
     sentUser: boolean
   ) {
-    let generatedId: string;
-    let fetchedUserId: string;
-    let newMessage: Message;
 
-    return this.authService.userId.pipe(
-      take(1),
-      switchMap(userId => {
-        fetchedUserId = userId;
-        return this.authService.token;
-      }),
+    let updatedMessage: Message[];
+    let fetchedToken: string;
+    console.log('Tweede Method');
+    return this.authService.token.pipe(
       take(1),
       switchMap(token => {
-        if (!fetchedUserId) {
-          throw new Error('No user found!');
-        }
-        newMessage = new Message(
-          Math.random().toString(),
-          fromUser,
-          toUser,
-          toUserEmail,
-          message,
-          documentURL,
-          sentUser,
-          false,
-          false
-        );
-        return this.http.post<{name: string}>(
-          `https://stratos-ad2db.firebaseio.com/messages.json?auth=${token}`,
-          {
-            ...newMessage,
-            id: null
-          }
-        );
-      }), switchMap(resData => {
-        generatedId = resData.name;
+        fetchedToken = token;
         return this.messages;
       }),
       take(1),
-      tap(messages => {
-        newMessage.id = generatedId;
-        this._messages.next(messages.concat(newMessage));
+      switchMap(messages => {
+        if (!messages || messages.length <= 0) {
+          return this.fetchMessages();
+        } else {
+          return of(messages);
+        }
+      }),
+      switchMap(messages => {
+        const updatedMessageIndex = messages.findIndex(pl => pl.id === messageID);
+        updatedMessage = [...messages];
+        const oldMessage = updatedMessage[updatedMessageIndex];
+        const newMessageItem = {message: message, documentURL: documentURL, sentUser: sentUser};
+        this.newMessageList = oldMessage.message;
+        this.newMessageList.push(newMessageItem);
+        updatedMessage[updatedMessageIndex] = new Message(
+          oldMessage.id,
+          fromUser,
+          toUser,
+          toUserEmail,
+          this.newMessageList
+        );
+        return this.http.put(
+          `https://stratos-ad2db.firebaseio.com/messages/${messageID}.json?auth=${fetchedToken}`,
+          { ...updatedMessage[updatedMessageIndex], id: null }
+        );
+      }),
+      tap(() => {
+        this._messages.next(updatedMessage);
       })
     );
   }

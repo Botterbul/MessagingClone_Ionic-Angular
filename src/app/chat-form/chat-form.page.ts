@@ -176,6 +176,7 @@ export class ChatFormPage implements OnInit {
         loadingEl.present();
         this.messageService
           .addMessage(
+            this.relevantMessages[0].id,
             this.user_ID,
             this.userID,
             this.friendName,
