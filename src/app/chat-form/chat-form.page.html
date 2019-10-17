@@ -5,12 +5,9 @@
     </ion-buttons>
     <ion-title>{{ friendName }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button *ngIf="showAttachements">
-        <ion-icon name="image"></ion-icon>
-        <input (change)="uploadImage($event)" type="file" class="image-upload" accept="image/*">
-      </ion-button>
-      <ion-button (click)="sendAttachment()">
+      <ion-button>
         <ion-icon name="attach"></ion-icon>
+        <input (change)="uploadImage($event)" type="file" class="image-upload" accept="/*">
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -26,8 +23,16 @@
       <ion-col size="12">
         <ion-list>
           <ion-item *ngFor="let message of messagesBetweenUsers">
-            <ion-label *ngIf="message.emailSent === myEmail" text-right> {{ message.message }} </ion-label>
-            <ion-label *ngIf="message.emailSent !== myEmail" text-left> {{ message.message }} </ion-label>
+            <div *ngIf="message.message !== 'Download FILE#*-199'">
+              <ion-label *ngIf="message.emailSent === myEmail" text-right> {{ message.message }} </ion-label>
+              <ion-label *ngIf="message.emailSent !== myEmail" text-left> {{ message.message }} </ion-label>
+            </div>
+            <div *ngIf="message.message === 'Download FILE#*-199'">
+              <p>File attached:</p>
+              <ion-button (click)="downloadFileUrl(message.documentURL)">
+                Download
+              </ion-button>
+            </div>
           </ion-item>
         </ion-list>
       </ion-col>
@@ -35,11 +40,6 @@
     <div class="box">
       <div class="preview">
         <img *ngIf="imageUrl" [src]="url" alt="">
-      </div>
-      <div class="uploadbtn">
-        <label>
-          <!-- <input (change)="uploadImage($event)" type="file" class="image-upload" accept="image/*"> -->
-        </label>
       </div>
     </div>
     <br>

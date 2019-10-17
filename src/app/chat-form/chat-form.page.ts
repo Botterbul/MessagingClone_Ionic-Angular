@@ -50,7 +50,6 @@ export class ChatFormPage implements OnInit {
     id: this.afs.createId(), image: ''
   };
   loading: boolean = false;
-  showAttachements = false;
 
   constructor(
     private router: Router,
@@ -112,8 +111,14 @@ export class ChatFormPage implements OnInit {
   }
 
   uploadImage(event) {
-    this.loading = true;
-    if (event.target.files && event.target.files[0]) {
+    this.loadingCtrl
+              .create({
+                message: 'Sending file...'
+              })
+              .then(loadingEl => {
+                loadingEl.present();
+                this.loading = true;
+                if (event.target.files && event.target.files[0]) {
       var reader = new FileReader();
       reader.readAsDataURL(event.target.files[0]);
       // For Preview Of Image
@@ -121,7 +126,7 @@ export class ChatFormPage implements OnInit {
         this.url = e.target.result;
         // For Uploading Image To Firebase
         const fileraw = event.target.files[0];
-        const filePath = '/Image/'+'Image' + (Math.floor(1000 + Math.random() * 9000) + 1);
+        const filePath = '/Image/' + 'Image' + (Math.floor(1000 + Math.random() * 9000) + 1);
         const result = this.SaveImageRef(filePath, fileraw);
         const ref = result.ref;
         result.task.then(a => {
@@ -130,75 +135,24 @@ export class ChatFormPage implements OnInit {
             this.imageURLLink = a;
             console.log(this.imageURLLink);
             this.loading = false;
-            this.loadingCtrl
-              .create({
-                message: 'Sending image...'
-              })
-              .then(loadingEl => {
-                loadingEl.present();
-                this.messageService
-                  .sendImage(
-                    this.relevantMessages[0].id,
-                    'Image',
-                    this.imageURLLink,
-                    true,
-                    this.myEmail
-                    )
-                    .subscribe(() => {
-                    loadingEl.dismiss();
-                    this.form.reset();
-                });
-              });
           });
           this.afs.collection('Image').doc(this.newImage.id).set(this.newImage);
         });
       };
     }
-  }
-
-  uploadFile(event) {
-    this.loading = true;
-    if (event.target.files && event.target.files[0]) {
-      var reader = new FileReader();
-      reader.readAsDataURL(event.target.files[0]);
-      // For Preview Of Image
-      reader.onload = (e:any) => { // called once readAsDataURL is completed
-        this.url = e.target.result;
-        // For Uploading Image To Firebase
-        const fileraw = event.target.files[0];
-        const filePath = '/Image/'+'Image' + (Math.floor(1000 + Math.random() * 9000) + 1);
-        const result = this.SaveImageRef(filePath, fileraw);
-        const ref = result.ref;
-        result.task.then(a => {
-          ref.getDownloadURL().subscribe(a => {
-            this.newImage.image = a;
-            this.imageURLLink = a;
-            console.log(this.imageURLLink);
-            this.loading = false;
-            this.loadingCtrl
-              .create({
-                message: 'Sending image...'
-              })
-              .then(loadingEl => {
-                loadingEl.present();
                 this.messageService
                   .sendImage(
-                    this.relevantMessages[0].id,
-                    'Image',
-                    this.imageURLLink,
-                    true,
-                    this.myEmail
-                    )
-                    .subscribe(() => {
-                    loadingEl.dismiss();
-                    this.form.reset();
-                });
-              });
-          });
-          this.afs.collection('Image').doc(this.newImage.id).set(this.newImage);
-        });
-      };
-    }
+                  this.relevantMessages[0].id,
+                  'Download FILE#*-199',
+                  this.imageURLLink,
+                  true,
+                  this.myEmail
+                  )
+                  .subscribe(() => {
+                  loadingEl.dismiss();
+                  this.form.reset();
+                  });
+                  });
   }
 
   ionViewWillEnter() {
@@ -212,6 +166,10 @@ export class ChatFormPage implements OnInit {
     this.userService.fetchUsers().subscribe(() => {
       this.isLoading = false;
     });
+  }
+
+  downloadFileUrl(url: string) {
+    
   }
 
   async refreshMessages() {
