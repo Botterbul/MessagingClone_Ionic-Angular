@@ -43,14 +43,15 @@ export class HomePage {
     });
     this.messageSub = this.messageService.messages.subscribe(messages => {
       this.loadedMessages = messages;
+      console.log(this.user_ID);
       this.relevantMessages = this.loadedMessages.filter(
         message => message.fromUser === this.user_ID || message.toUser === this.user_ID
       );
     });
   }
 
-  onClickChat() {
-    this.router.navigate(['/', 'chat-form', this.relevantMessages[0].toUser]);
+  onClickChat(userID: string) {
+    this.router.navigate(['/', 'chat-form', userID]);
   }
 
   onDelete(messageID: string, slidingItem: IonItemSliding) {
@@ -67,7 +68,9 @@ export class HomePage {
     this.isLoading = true;
     this.messageService.fetchMessages().subscribe(() => {
       this.isLoading = false;
-      this.messageObject = this.relevantMessages[0].message[0].message;
+      if(this.relevantMessages.length >= 1) {
+        this.messageObject = this.relevantMessages[0].message[0].message;
+      }
     });
     this.userService.fetchUsers().subscribe(() => {
       this.isLoading = false;

@@ -101,12 +101,14 @@ export class CurrentFriendsPage implements OnInit {
                 this.relevantUser[0].id,
                 this.relevantUser[0].email,
                 this.relevantFriendUser[0].email,
-                userID).subscribe(() => {
+                userID
+                ).subscribe(() => {
                   this.userService.acceptFriendInvitation(
                     this.relevantFriendUser[0].id,
                     this.relevantFriendUser[0].email,
                     this.relevantUser[0].email,
-                    this.relevantUser[0].userId).subscribe(() => {
+                    this.relevantUser[0].userId
+                    ).subscribe(() => {
                     loadingEl.dismiss();
                   });
               });

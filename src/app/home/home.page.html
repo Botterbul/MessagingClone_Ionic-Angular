@@ -33,12 +33,14 @@
         <div *ngFor="let message of relevantMessages">
           <ion-list>
           <ion-item-sliding #slidingItem>
-            <ion-item (click)="onClickChat()">
-              <!--
-              <ion-avatar slot="start">
-                <ion-img [src]="message.imageURL"></ion-img> 
-              </ion-avatar> 
-              -->   
+            <ion-item *ngIf="message.fromUser !== user_ID" (click)="onClickChat(message.fromUser)">
+              <ion-label>
+                <h2 *ngIf="message.fromUser === user_ID">{{ message.toUserEmail }}</h2>
+                <h2 *ngIf="message.fromUser !== user_ID">{{ message.fromUserEmail }}</h2>
+                <h4>{{ messageObject | slice:0:25 }}...</h4>
+              </ion-label>
+            </ion-item>
+            <ion-item *ngIf="message.fromUser === user_ID" (click)="onClickChat(message.toUser)">
               <ion-label>
                 <h2 *ngIf="message.fromUser === user_ID">{{ message.toUserEmail }}</h2>
                 <h2 *ngIf="message.fromUser !== user_ID">{{ message.fromUserEmail }}</h2>

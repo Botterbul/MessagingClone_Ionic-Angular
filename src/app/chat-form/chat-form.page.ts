@@ -94,7 +94,7 @@ export class ChatFormPage implements OnInit {
     this.messageSub = this.messageService.messages.subscribe(messages => {
       this.loadedMessages = messages;
       this.relevantMessages = this.loadedMessages.filter(
-        message => message.fromUser === this.user_ID || message.fromUser === this.userID
+        message => (message.fromUser === this.user_ID && message.toUser === this.userID) || (message.fromUser === this.userID && message.toUser === this.user_ID)
       );
       this.messagesBetweenUsers = this.relevantMessages[0].message;
     });
