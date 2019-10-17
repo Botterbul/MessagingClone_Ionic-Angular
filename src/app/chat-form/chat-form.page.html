@@ -44,6 +44,15 @@
   </ion-grid>
   <ion-grid style="position: fixed;bottom: 0;width:100%" *ngIf="!isLoading">
     <ion-row>
+      <ion-col>
+        <ion-col size="2" text-center>
+          <form [formGroup]="form2">
+            <app-image-picker (imagePick)="onImagePicked($event)" [showPreview]="form2.get('image').value"></app-image-picker>
+          </form>
+        </ion-col>
+      </ion-col>
+    </ion-row>
+    <ion-row>
       <ion-col size="8">
         <form [formGroup]="form">
           <ion-input [(ngModel)]="message" formControlName="message" style="border-style: solid;border-width: 1px;"></ion-input>
