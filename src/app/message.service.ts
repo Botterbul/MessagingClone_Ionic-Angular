@@ -118,6 +118,55 @@ export class MessageService {
     );
   }
 
+  sendImage(
+    messageID: string,
+    message: string,
+    documentURL: string,
+    sentUser: boolean,
+    emailSent: string
+  ) {
+    let updatedMessage: Message[];
+    let fetchedToken: string;
+    return this.authService.token.pipe(
+      take(1),
+      switchMap(token => {
+        fetchedToken = token;
+        return this.messages;
+      }),
+      take(1),
+      switchMap(messages => {
+        if (!messages || messages.length <= 0) {
+          return this.fetchMessages();
+        } else {
+          return of(messages);
+        }
+      }),
+      switchMap(messages => {
+        const updatedMessageIndex = messages.findIndex(pl => pl.id === messageID);
+        updatedMessage = [...messages];
+        const oldMessage = updatedMessage[updatedMessageIndex];
+        const newMessageItem = {message: message, documentURL: documentURL, sentUser: sentUser, emailSent: emailSent};
+        this.newMessageList = oldMessage.message;
+        this.newMessageList.push(newMessageItem);
+        updatedMessage[updatedMessageIndex] = new Message(
+          oldMessage.id,
+          oldMessage.fromUser,
+          oldMessage.fromUserEmail,
+          oldMessage.toUser,
+          oldMessage.toUserEmail,
+          this.newMessageList
+        );
+        return this.http.put(
+          `https://stratos-ad2db.firebaseio.com/messages/${messageID}.json?auth=${fetchedToken}`,
+          { ...updatedMessage[updatedMessageIndex], id: null }
+        );
+      }),
+      tap(() => {
+        this._messages.next(updatedMessage);
+      })
+    );
+  }
+
   addFirstMessage(
     fromUser: string,
     fromUserEmail: string,

@@ -7,6 +7,10 @@ import { IonicModule } from '@ionic/angular';
 
 import { ChatFormPage } from './chat-form.page';
 import { SharedModule } from '../pickers/shared.module';
+import { environment } from 'src/environments/environment';
+import { AngularFirestoreModule } from '@angular/fire/firestore';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireStorageModule } from '@angular/fire/storage';
 
 const routes: Routes = [
   {
@@ -22,7 +26,10 @@ const routes: Routes = [
     ReactiveFormsModule,
     IonicModule,
     RouterModule.forChild(routes),
-    SharedModule
+    SharedModule,
+    AngularFireModule.initializeApp(environment.firebase, 'feedback=15900'),
+    AngularFirestoreModule,
+    AngularFireStorageModule
   ],
   declarations: [ChatFormPage]
 })

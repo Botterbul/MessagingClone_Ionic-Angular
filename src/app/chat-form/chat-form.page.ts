@@ -8,26 +8,12 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MessageService } from '../message.service';
 import { Message } from '../message.model';
 import { SimpleCrypto } from "simple-crypto-js";
+import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFireStorage } from '@angular/fire/storage';
 
-function base64toBlob(base64Data, contentType) {
-  contentType = contentType || '';
-  const sliceSize = 1024;
-  const byteCharacters = window.atob(base64Data);
-  const bytesLength = byteCharacters.length;
-  const slicesCount = Math.ceil(bytesLength / sliceSize);
-  const byteArrays = new Array(slicesCount);
-
-  for (let sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
-    const begin = sliceIndex * sliceSize;
-    const end = Math.min(begin + sliceSize, bytesLength);
-
-    const bytes = new Array(end - begin);
-    for (let offset = begin, i = 0; offset < end; ++i, ++offset) {
-      bytes[i] = byteCharacters[offset].charCodeAt(0);
-    }
-    byteArrays[sliceIndex] = new Uint8Array(bytes);
-  }
-  return new Blob(byteArrays, { type: contentType });
+export interface Image {
+  id: string;
+  image: string;
 }
 
 @Component({
@@ -35,6 +21,7 @@ function base64toBlob(base64Data, contentType) {
   templateUrl: './chat-form.page.html',
   styleUrls: ['./chat-form.page.scss'],
 })
+
 export class ChatFormPage implements OnInit {
   userID: string;
   form: FormGroup;
@@ -49,6 +36,7 @@ export class ChatFormPage implements OnInit {
   friendName: string;
   message: string;
   messagesBetweenUsers = [];
+  imageURLLink: string;
   checkMessages = false;
   loadedMessages: Message[];
   private messageSub: Subscription;
@@ -57,6 +45,12 @@ export class ChatFormPage implements OnInit {
   myEmail: string;
   checkMyEmail: string;
   simpleCrypto = new SimpleCrypto(this._secretKey);
+  url: any;
+  newImage: Image = {
+    id: this.afs.createId(), image: ''
+  };
+  loading: boolean = false;
+  showAttachements = false;
 
   constructor(
     private router: Router,
@@ -64,7 +58,9 @@ export class ChatFormPage implements OnInit {
     private route: ActivatedRoute,
     private userService: UserService,
     private messageService: MessageService,
-    private loadingCtrl: LoadingController
+    private loadingCtrl: LoadingController,
+    private afs: AngularFirestore,
+    private storage: AngularFireStorage
     ) { }
 
   ngOnInit() {
@@ -115,22 +111,94 @@ export class ChatFormPage implements OnInit {
     });
   }
 
-  onImagePicked(imageData: string | File) {
-    let imageFile;
-    if (typeof imageData === 'string') {
-      try {
-        imageFile = base64toBlob(
-          imageData.replace('data:image/jpeg;base64,', ''),
-          'image/jpeg'
-        );
-      } catch (error) {
-        console.log(error);
-        return;
-      }
-    } else {
-      imageFile = imageData;
+  uploadImage(event) {
+    this.loading = true;
+    if (event.target.files && event.target.files[0]) {
+      var reader = new FileReader();
+      reader.readAsDataURL(event.target.files[0]);
+      // For Preview Of Image
+      reader.onload = (e:any) => { // called once readAsDataURL is completed
+        this.url = e.target.result;
+        // For Uploading Image To Firebase
+        const fileraw = event.target.files[0];
+        const filePath = '/Image/'+'Image' + (Math.floor(1000 + Math.random() * 9000) + 1);
+        const result = this.SaveImageRef(filePath, fileraw);
+        const ref = result.ref;
+        result.task.then(a => {
+          ref.getDownloadURL().subscribe(a => {
+            this.newImage.image = a;
+            this.imageURLLink = a;
+            console.log(this.imageURLLink);
+            this.loading = false;
+            this.loadingCtrl
+              .create({
+                message: 'Sending image...'
+              })
+              .then(loadingEl => {
+                loadingEl.present();
+                this.messageService
+                  .sendImage(
+                    this.relevantMessages[0].id,
+                    'Image',
+                    this.imageURLLink,
+                    true,
+                    this.myEmail
+                    )
+                    .subscribe(() => {
+                    loadingEl.dismiss();
+                    this.form.reset();
+                });
+              });
+          });
+          this.afs.collection('Image').doc(this.newImage.id).set(this.newImage);
+        });
+      };
     }
-    this.form.patchValue({ image: imageFile });
+  }
+
+  uploadFile(event) {
+    this.loading = true;
+    if (event.target.files && event.target.files[0]) {
+      var reader = new FileReader();
+      reader.readAsDataURL(event.target.files[0]);
+      // For Preview Of Image
+      reader.onload = (e:any) => { // called once readAsDataURL is completed
+        this.url = e.target.result;
+        // For Uploading Image To Firebase
+        const fileraw = event.target.files[0];
+        const filePath = '/Image/'+'Image' + (Math.floor(1000 + Math.random() * 9000) + 1);
+        const result = this.SaveImageRef(filePath, fileraw);
+        const ref = result.ref;
+        result.task.then(a => {
+          ref.getDownloadURL().subscribe(a => {
+            this.newImage.image = a;
+            this.imageURLLink = a;
+            console.log(this.imageURLLink);
+            this.loading = false;
+            this.loadingCtrl
+              .create({
+                message: 'Sending image...'
+              })
+              .then(loadingEl => {
+                loadingEl.present();
+                this.messageService
+                  .sendImage(
+                    this.relevantMessages[0].id,
+                    'Image',
+                    this.imageURLLink,
+                    true,
+                    this.myEmail
+                    )
+                    .subscribe(() => {
+                    loadingEl.dismiss();
+                    this.form.reset();
+                });
+              });
+          });
+          this.afs.collection('Image').doc(this.newImage.id).set(this.newImage);
+        });
+      };
+    }
   }
 
   ionViewWillEnter() {
@@ -191,7 +259,6 @@ export class ChatFormPage implements OnInit {
       .then(loadingEl => {
         loadingEl.present();
         //let cipherText = this.simpleCrypto.encrypt(this.form.value.message);
-
         this.messageService
           .addMessage(
             this.relevantMessages[0].id,
@@ -206,6 +273,13 @@ export class ChatFormPage implements OnInit {
         });
       });
     }
+  }
+
+  SaveImageRef(filePath, file) {
+    return {
+      task: this.storage.upload(filePath, file)
+      , ref: this.storage.ref(filePath)
+    };
   }
 
   ngOnDestroy() {
