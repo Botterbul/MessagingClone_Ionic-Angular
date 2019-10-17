@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   firebaseAPIKey: 'AIzaSyCE59EpnJzdQ-CUu4Al8iDQ7mKIrNy8QaI',
-  firebase : {
+  firebase: {
     apiKey: "AIzaSyCE59EpnJzdQ-CUu4Al8iDQ7mKIrNy8QaI",
     authDomain: "stratos-ad2db.firebaseapp.com",
     databaseURL: "https://stratos-ad2db.firebaseio.com",

@@ -7,7 +7,7 @@ import { User } from '../user.model';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MessageService } from '../message.service';
 import { Message } from '../message.model';
-import { SimpleCrypto } from "simple-crypto-js";
+import { SimpleCrypto } from 'simple-crypto-js';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
@@ -33,6 +33,7 @@ export class ChatFormPage implements OnInit {
   loadedUsers: User[];
   relevantUser: User[];
   relevantFriendUser: User[];
+  imageUrl = false;
   public user_ID: string;
   friendName: string;
   message: string;
@@ -40,9 +41,10 @@ export class ChatFormPage implements OnInit {
   imageURLLink: string;
   checkMessages = false;
   loadedMessages: Message[];
+  decryptedMessages: Message[];
   private messageSub: Subscription;
   relevantMessages: Message[];
-  private _secretKey = "HASH";
+  private _secretKey = 'ITRW322';
   myEmail: string;
   checkMyEmail: string;
   simpleCrypto = new SimpleCrypto(this._secretKey);
@@ -50,7 +52,7 @@ export class ChatFormPage implements OnInit {
   newImage: Image = {
     id: this.afs.createId(), image: ''
   };
-  loading: boolean = false;
+  loading = false;
 
   constructor(
     private router: Router,
@@ -101,15 +103,21 @@ export class ChatFormPage implements OnInit {
       );
       this.messagesBetweenUsers = this.relevantMessages[0].message;
       this.checkMyEmail = this.relevantMessages[0].fromUserEmail;
-      /*
-      var i;
-      for (i = 0; i < this.messagesBetweenUsers.length; i++) {
-        let decipherText = this.simpleCrypto.decrypt(this.messagesBetweenUsers[i].message);
-        this.messagesBetweenUsers[i].message = decipherText;
-        console.log(this.messagesBetweenUsers[i].message);
-      }
-      */
     });
+    /*let i;
+    for (i = 0; i < this.loadedMessages.length; i++) {
+        let k;
+        for (k = 0; k < this.loadedMessages[i].message.length; k++) {
+          let decipherText = this.simpleCrypto.decrypt(this.loadedMessages[i].message[k].message);
+          this.loadedMessages[i].message[k].message = decipherText;
+        }
+      }
+    this.messagesBetweenUsers = this.loadedMessages;
+    */
+  }
+
+  sendVoiceNote() {
+    
   }
 
   uploadImage(event) {
@@ -121,10 +129,10 @@ export class ChatFormPage implements OnInit {
                 loadingEl2.present();
                 this.loading = true;
                 if (event.target.files && event.target.files[0]) {
-      var reader = new FileReader();
+      let reader = new FileReader();
       reader.readAsDataURL(event.target.files[0]);
       // For Preview Of Image
-      reader.onload = (e:any) => { // called once readAsDataURL is completed
+      reader.onload = (e: any) => { // called once readAsDataURL is completed
         this.url = e.target.result;
         // For Uploading Image To Firebase
         const fileraw = event.target.files[0];
@@ -170,8 +178,7 @@ export class ChatFormPage implements OnInit {
     this.checkMessages = true;
     this.messageService.fetchMessages().subscribe(() => {
       this.isLoading = false;
-      //this.refreshMessages();
-      //Moet hier net aansit vir messages refresh
+      this.refreshMessages();
     });
     this.userService.fetchUsers().subscribe(() => {
       this.isLoading = false;
@@ -190,7 +197,6 @@ export class ChatFormPage implements OnInit {
     while (this.checkMessages) {
       this.messageService.fetchMessages().subscribe(() => {
       });
-      console.log('Still Checking Messages');
       await delay(1000);
     }
   }
@@ -199,22 +205,6 @@ export class ChatFormPage implements OnInit {
     return this.userService.retrieveUserID().subscribe(() => {
       this.user_ID = this.userService.user_ID;
     });
-  }
-
-  //onImagePicked(imageData: string) {
-  //
-  //}
-
-  sendAttachment() {
-
-  }
-
-  sendVoiceNote() {
-
-  }
-
-  sendImage() {
-
   }
 
   sendMessage() {
@@ -227,7 +217,8 @@ export class ChatFormPage implements OnInit {
       })
       .then(loadingEl => {
         loadingEl.present();
-        //let cipherText = this.simpleCrypto.encrypt(this.form.value.message);
+        //let plainText = this.form.value.message;
+        //let chiperText = this.simpleCrypto.encrypt(plainText);
         this.messageService
           .addMessage(
             this.relevantMessages[0].id,
