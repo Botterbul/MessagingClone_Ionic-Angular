@@ -34,9 +34,11 @@
           <ion-list>
           <ion-item-sliding #slidingItem>
             <ion-item lines="none" (click)="onClickChat()">
+              <!--
               <ion-avatar slot="start">
-              <ion-img [src]="message.imageURL"></ion-img> 
-              </ion-avatar>    
+                <ion-img [src]="message.imageURL"></ion-img> 
+              </ion-avatar> 
+              -->   
               <ion-label>
                 <h2>{{ message.toUserEmail }}</h2>
                 <h4>{{ message.message | slice:0:25 }}...</h4>

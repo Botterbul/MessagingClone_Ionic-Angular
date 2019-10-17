@@ -20,9 +20,11 @@
                 <ion-item-sliding *ngFor="let user of relevantUser" #slidingItem>
                   <div *ngFor="let friend of user.friends">
                       <ion-item lines="none" (click)="onClickUser(friend.userID)">
-                      <ion-avatar slot="start">
-                      <!-- <ion-img [src]="book.imageURL"></ion-img> -->
-                      </ion-avatar>    
+                        <!--
+                        <ion-avatar slot="start">
+                          <ion-img [src]="message.imageURL"></ion-img> 
+                        </ion-avatar> 
+                        -->  
                       <ion-label>
                         <h2>{{ friend.userEmail }}</h2>
                       </ion-label>

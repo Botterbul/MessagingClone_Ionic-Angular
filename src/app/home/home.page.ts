@@ -46,6 +46,11 @@ export class HomePage {
       );
       // Moet hier die array distinct vir chat
     });
+    let i;
+    let k;
+    for (i = 0; i < this.relevantMessages.length; i++) {
+      
+    }
   }
 
   onClickChat() {
