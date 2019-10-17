@@ -1,7 +1,8 @@
 {
   "name": "Stratos",
   "integrations": {
-    "cordova": {}
+    "cordova": {},
+    "capacitor": {}
   },
   "type": "angular"
 }

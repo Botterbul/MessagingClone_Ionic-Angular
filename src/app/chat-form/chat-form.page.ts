@@ -11,6 +11,8 @@ import { SimpleCrypto } from 'simple-crypto-js';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
+import * as RecordRTC from 'recordrtc';
+import { DomSanitizer } from '@angular/platform-browser';
 
 export interface Image {
   id: string;
@@ -53,6 +55,13 @@ export class ChatFormPage implements OnInit {
     id: this.afs.createId(), image: ''
   };
   loading = false;
+  //Lets initiate Record OBJ
+  private record;
+  //Will use this flag for detect recording
+  public recording = false;
+  //Url of Blob
+  public error;
+  iCall = 0;
 
   constructor(
     private router: Router,
@@ -63,8 +72,13 @@ export class ChatFormPage implements OnInit {
     private loadingCtrl: LoadingController,
     private afs: AngularFirestore,
     private storage: AngularFireStorage,
-    private iab: InAppBrowser
+    private iab: InAppBrowser,
+    private domSanitizer: DomSanitizer
     ) { }
+
+    sanitize(url: string) {
+      return this.domSanitizer.bypassSecurityTrustUrl(url);
+    }
 
   ngOnInit() {
     this.form = new FormGroup({
@@ -117,7 +131,54 @@ export class ChatFormPage implements OnInit {
   }
 
   sendVoiceNote() {
-    
+    console.log(this.url);
+  }
+
+  initiateRecording() {
+    this.recording = true;
+    let mediaConstraints = {
+      video: false,
+      audio: true
+    };
+    navigator.mediaDevices
+      .getUserMedia(mediaConstraints)
+      .then(this.successCallback.bind(this), this.errorCallback.bind(this));
+  }
+
+  successCallback(stream) {
+    var options = {
+      mimeType: "audio/wav",
+      numberOfAudioChannels: 1
+    };
+    //Start Actuall Recording
+    var StereoAudioRecorder = RecordRTC.StereoAudioRecorder;
+    this.record = new StereoAudioRecorder(stream, options);
+    this.record.record();
+  }
+
+  stopRecording() {
+    this.recording = false;
+    this.record.stop(this.processRecording.bind(this));
+    //if (this.iCall <= 0) {
+    //  this.initiateRecording();
+    //  this.stopRecording();
+    //  this.iCall++;
+    //}
+    this.sendVoiceNote();
+  }
+
+  /**
+   * processRecording Do what ever you want with blob
+   * @param {any} blob Blog
+   */
+  processRecording(blob) {
+    this.url = URL.createObjectURL(blob);
+  }
+  /**
+   * Process Error.
+   */
+  errorCallback(error) {
+    this.error = 'Can not play audio in your browser';
   }
 
   uploadImage(event) {
@@ -178,7 +239,7 @@ export class ChatFormPage implements OnInit {
     this.checkMessages = true;
     this.messageService.fetchMessages().subscribe(() => {
       this.isLoading = false;
-      this.refreshMessages();
+      //this.refreshMessages();
     });
     this.userService.fetchUsers().subscribe(() => {
       this.isLoading = false;

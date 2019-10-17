@@ -25,7 +25,13 @@
           <ion-item *ngFor="let message of messagesBetweenUsers">
             <ion-label *ngIf="message.emailSent === myEmail && message.message !== 'Download FILE#*-199'" text-right> {{ message.message }} </ion-label>
             <ion-label *ngIf="message.emailSent !== myEmail && message.message !== 'Download FILE#*-199'" text-left> {{ message.message }} </ion-label>
-            <div *ngIf="message.message === 'Download FILE#*-199'">
+            <div *ngIf="message.message === 'Download FILE#*-199' && message.emailSent === myEmail" text-right>
+              <p>File attached:</p>
+              <ion-button (click)="downloadFileUrl(message.documentURL)">
+                Download
+              </ion-button>
+            </div>
+            <div *ngIf="message.message === 'Download FILE#*-199' && message.emailSent !== myEmail" text-left>
               <p>File attached:</p>
               <ion-button (click)="downloadFileUrl(message.documentURL)">
                 Download
@@ -36,6 +42,11 @@
       </ion-col>
     </ion-row>
     <br>
+    <div class="clearfix" style="text-align:center">
+      <audio controls="" *ngIf="url">
+        <source [src]="sanitize(url)" type="audio/wav" />
+      </audio>
+    </div>
     <br>
     <ion-row style="bottom: 0px;position:fixed; width:95%">
       <ion-col size="8">
@@ -43,15 +54,22 @@
           <ion-input [(ngModel)]="message" formControlName="message" style="border-style: solid;border-width: 1px;"></ion-input>
         </form>
       </ion-col>
-      <ion-col size="2" class="ion-text-center">
-        <ion-button (click)="sendMessage()" style="width:100%; height:100%">
-          <ion-icon name="paper-plane"></ion-icon>
-        </ion-button>
+      <ion-col size="2">
+        <div style="text-align:center" class="bottom-right">
+          <ion-button shape="round" (click)="sendMessage()">
+            <ion-icon name="paper-plane"></ion-icon>
+          </ion-button>
+        </div>
       </ion-col>
       <ion-col size="2">
-        <ion-button (click)="sendVoiceNote()" style="width:100%; height:100%">
-          <ion-icon name="mic"></ion-icon>
-        </ion-button>
+        <div style="text-align:center" class="bottom-right">
+          <ion-button shape="round" (click)="initiateRecording()" *ngIf="!recording">
+            <ion-icon name="mic"></ion-icon>
+          </ion-button>
+          <ion-button shape="round" (click)="stopRecording()" *ngIf="recording">
+            <ion-icon name="play"></ion-icon>
+          </ion-button>
+        </div>
       </ion-col>
     </ion-row>
   </ion-grid>
