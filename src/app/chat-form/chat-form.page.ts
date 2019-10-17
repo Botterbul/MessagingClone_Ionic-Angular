@@ -130,10 +130,6 @@ export class ChatFormPage implements OnInit {
     */
   }
 
-  sendVoiceNote() {
-    console.log(this.url);
-  }
-
   initiateRecording() {
     this.recording = true;
     let mediaConstraints = {
@@ -159,12 +155,6 @@ export class ChatFormPage implements OnInit {
   stopRecording() {
     this.recording = false;
     this.record.stop(this.processRecording.bind(this));
-    //if (this.iCall <= 0) {
-    //  this.initiateRecording();
-    //  this.stopRecording();
-    //  this.iCall++;
-    //}
-    this.sendVoiceNote();
   }
 
   /**
@@ -224,6 +214,7 @@ export class ChatFormPage implements OnInit {
                   .subscribe(() => {
                   loadingEl.dismiss();
                   this.form.reset();
+                  this.url = null;
                   });
                   });
           });
