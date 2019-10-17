@@ -33,7 +33,7 @@
         <div *ngFor="let message of relevantMessages">
           <ion-list>
           <ion-item-sliding #slidingItem>
-            <ion-item lines="none" (click)="onClickChat()">
+            <ion-item (click)="onClickChat()">
               <!--
               <ion-avatar slot="start">
                 <ion-img [src]="message.imageURL"></ion-img> 

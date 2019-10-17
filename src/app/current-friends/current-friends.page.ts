@@ -61,7 +61,8 @@ export class CurrentFriendsPage implements OnInit {
         user => user.userId === userID
       );
       this.userService.deleteFriend(this.relevantUser[0].id, userID).subscribe(() => {
-        this.userService.deleteFriend(userID, this.relevantUser[0].userId).subscribe(() => {
+        console.log(this.relevantUser[0].id);
+        this.userService.deleteFriend(this.relevantFriendUser[0].id, this.relevantUser[0].userId).subscribe(() => {
           loadingEl.dismiss();
         });
       });
