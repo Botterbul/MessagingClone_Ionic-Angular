@@ -1,5 +1,7 @@
 {
   "name": "Stratos",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

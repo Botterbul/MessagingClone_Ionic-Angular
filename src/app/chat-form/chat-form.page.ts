@@ -10,6 +10,7 @@ import { Message } from '../message.model';
 import { SimpleCrypto } from "simple-crypto-js";
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
+import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 
 export interface Image {
   id: string;
@@ -59,7 +60,8 @@ export class ChatFormPage implements OnInit {
     private messageService: MessageService,
     private loadingCtrl: LoadingController,
     private afs: AngularFirestore,
-    private storage: AngularFireStorage
+    private storage: AngularFireStorage,
+    private iab: InAppBrowser
     ) { }
 
   ngOnInit() {
@@ -113,10 +115,10 @@ export class ChatFormPage implements OnInit {
   uploadImage(event) {
     this.loadingCtrl
               .create({
-                message: 'Sending file...'
+                message: 'Loading File...'
               })
-              .then(loadingEl => {
-                loadingEl.present();
+              .then(loadingEl2 => {
+                loadingEl2.present();
                 this.loading = true;
                 if (event.target.files && event.target.files[0]) {
       var reader = new FileReader();
@@ -135,11 +137,13 @@ export class ChatFormPage implements OnInit {
             this.imageURLLink = a;
             console.log(this.imageURLLink);
             this.loading = false;
-          });
-          this.afs.collection('Image').doc(this.newImage.id).set(this.newImage);
-        });
-      };
-    }
+            loadingEl2.dismiss();
+            this.loadingCtrl
+              .create({
+                message: 'Sending file...'
+              })
+              .then(loadingEl => {
+                loadingEl.present();
                 this.messageService
                   .sendImage(
                   this.relevantMessages[0].id,
@@ -153,7 +157,13 @@ export class ChatFormPage implements OnInit {
                   this.form.reset();
                   });
                   });
-  }
+          });
+          this.afs.collection('Image').doc(this.newImage.id).set(this.newImage);
+        });
+      };
+    }
+  });
+}
 
   ionViewWillEnter() {
     this.isLoading = true;
@@ -169,7 +179,8 @@ export class ChatFormPage implements OnInit {
   }
 
   downloadFileUrl(url: string) {
-    
+    console.log(url);
+    const browser = this.iab.create(url, '_blank');
   }
 
   async refreshMessages() {
