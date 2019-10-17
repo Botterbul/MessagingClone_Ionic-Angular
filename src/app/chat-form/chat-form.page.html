@@ -4,6 +4,14 @@
       <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
     <ion-title>{{ friendName }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="sendImage()">
+        <ion-icon name="image"></ion-icon>
+      </ion-button>
+      <ion-button (click)="sendAttachment()">
+        <ion-icon name="attach"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -15,15 +23,15 @@
   <ion-grid *ngIf="!isLoading">
     <ion-row>
         <div *ngIf="!isLoading">
-          <ion-list *ngFor="let message of loadedMessages" class="itemList" no-padding>
-            <ion-col size="6" *ngIf="message.fromUser === user_ID">
-              <ion-item text-center>
+          <ion-list *ngFor="let message of relevantMessages" class="itemList" no-padding>
+            <ion-col size="6" *ngIf="message.fromUser !== user_ID">
+              <ion-item>
                 <ion-label>
-                  <h4>{{ message.message }}</h4>
+                  <h4>{{ message.message }}A</h4>
                 </ion-label>
               </ion-item>
             </ion-col>
-            <ion-col size="6" *ngIf="message.fromUser !== user_ID">
+            <ion-col size="6" *ngIf="message.fromUser === user_ID">
               <ion-item> 
                 <ion-label>
                   <h4>{{ message.message }}</h4>
@@ -36,14 +44,19 @@
   </ion-grid>
   <ion-grid style="position: fixed;bottom: 0;width:100%" *ngIf="!isLoading">
     <ion-row>
-      <ion-col size="10">
+      <ion-col size="8">
         <form [formGroup]="form">
           <ion-input [(ngModel)]="message" formControlName="message" style="border-style: solid;border-width: 1px;"></ion-input>
         </form>
       </ion-col>
-      <ion-col size="2">
-        <ion-button (click)="sendMessage()" [disabled]="!form.valid">
+      <ion-col size="2" text-center>
+        <ion-button (click)="sendMessage()">
           <ion-icon name="paper-plane"></ion-icon>
+        </ion-button>
+      </ion-col>
+      <ion-col size="2" text-center>
+        <ion-button (click)="sendVoiceNote()">
+          <ion-icon name="mic"></ion-icon>
         </ion-button>
       </ion-col>
     </ion-row>

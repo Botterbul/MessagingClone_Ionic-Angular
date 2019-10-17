@@ -25,6 +25,7 @@ export class ChatFormPage implements OnInit {
   friendName: string;
   form: FormGroup;
   message: string;
+  checkMessages = false;
   loadedMessages: Message[];
   private messageSub: Subscription;
   relevantMessages: Message[];
@@ -75,12 +76,27 @@ export class ChatFormPage implements OnInit {
 
   ionViewWillEnter() {
     this.isLoading = true;
+    this.checkMessages = true;
     this.messageService.fetchMessages().subscribe(() => {
       this.isLoading = false;
+      //this.refreshMessages();
+      //Moet hier net aansit vir messages refresh
     });
     this.userService.fetchUsers().subscribe(() => {
       this.isLoading = false;
     });
+  }
+
+  async refreshMessages() {
+    function delay(ms: number) {
+      return new Promise( resolve => setTimeout(resolve, ms) );
+    }
+    while (this.checkMessages) {
+      this.messageService.fetchMessages().subscribe(() => {
+      });
+      console.log('Still Checking Messages');
+      await delay(1000);
+    }
   }
 
   getUserID() {
@@ -89,8 +105,23 @@ export class ChatFormPage implements OnInit {
     });
   }
 
+  sendAttachment() {
+
+  }
+
+  sendVoiceNote() {
+
+  }
+
+  sendImage() {
+    
+  }
+
   sendMessage() {
-    this.loadingCtrl
+    if (this.form.value.message.length <= 0) {
+      return;
+    } else {
+      this.loadingCtrl
       .create({
         message: 'Sending message...'
       })
@@ -110,6 +141,7 @@ export class ChatFormPage implements OnInit {
             this.form.reset();
         });
       });
+    }
   }
 
   ngOnDestroy() {
@@ -119,6 +151,7 @@ export class ChatFormPage implements OnInit {
     if (this.usersSub) {
       this.usersSub.unsubscribe();
     }
+    this.checkMessages = false;
   }
 
 }

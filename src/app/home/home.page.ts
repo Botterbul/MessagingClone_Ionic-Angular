@@ -21,6 +21,7 @@ export class HomePage {
   loadedUsers: User[];
   relevantUser: User[];
   public user_ID: string;
+  relevantChatMessages: User[];
   relevantMessages: Message[];
 
   constructor(
@@ -43,6 +44,7 @@ export class HomePage {
       this.relevantMessages = this.loadedMessages.filter(
         message => message.fromUser === this.user_ID
       );
+      // Moet hier die array distinct vir chat
     });
   }
 
