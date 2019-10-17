@@ -23,6 +23,8 @@ export class HomePage {
   public user_ID: string;
   relevantChatMessages: User[];
   relevantMessages: Message[];
+  oneMessage: Message[];
+  messageObject: Message[];
 
   constructor(
     private router: Router,
@@ -42,15 +44,9 @@ export class HomePage {
     this.messageSub = this.messageService.messages.subscribe(messages => {
       this.loadedMessages = messages;
       this.relevantMessages = this.loadedMessages.filter(
-        message => message.fromUser === this.user_ID
+        message => message.fromUser === this.user_ID || message.toUser === this.user_ID
       );
-      // Moet hier die array distinct vir chat
     });
-    let i;
-    let k;
-    for (i = 0; i < this.relevantMessages.length; i++) {
-      
-    }
   }
 
   onClickChat() {
@@ -71,6 +67,7 @@ export class HomePage {
     this.isLoading = true;
     this.messageService.fetchMessages().subscribe(() => {
       this.isLoading = false;
+      this.messageObject = this.relevantMessages[0].message[0].message;
     });
     this.userService.fetchUsers().subscribe(() => {
       this.isLoading = false;

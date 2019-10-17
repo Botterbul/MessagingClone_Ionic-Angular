@@ -47,6 +47,7 @@ export class ChatFormPage implements OnInit {
   public user_ID: string;
   friendName: string;
   message: string;
+  messagesBetweenUsers: Message[];
   checkMessages = false;
   loadedMessages: Message[];
   private messageSub: Subscription;
@@ -95,6 +96,7 @@ export class ChatFormPage implements OnInit {
       this.relevantMessages = this.loadedMessages.filter(
         message => message.fromUser === this.user_ID || message.fromUser === this.userID
       );
+      this.messagesBetweenUsers = this.relevantMessages[0].message;
     });
     // Moet dalk hier die if skryf om te wys watter kant is boodskap
   }
