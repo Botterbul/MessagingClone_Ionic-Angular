@@ -72,6 +72,7 @@ export class MessageService {
   addMessage(
     messageID: string,
     message: string,
+    encryptedMessage: string,
     documentURL: string,
     sentUser: boolean,
     emailSent: string
@@ -96,7 +97,7 @@ export class MessageService {
         const updatedMessageIndex = messages.findIndex(pl => pl.id === messageID);
         updatedMessage = [...messages];
         const oldMessage = updatedMessage[updatedMessageIndex];
-        const newMessageItem = {message: message, documentURL: documentURL, sentUser: sentUser, emailSent: emailSent};
+        const newMessageItem = {message: message, encryptedMessage: encryptedMessage, documentURL: documentURL, sentUser: sentUser, emailSent: emailSent};
         this.newMessageList = oldMessage.message;
         this.newMessageList.push(newMessageItem);
         updatedMessage[updatedMessageIndex] = new Message(

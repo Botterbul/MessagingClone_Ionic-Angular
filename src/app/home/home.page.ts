@@ -25,13 +25,18 @@ export class HomePage {
   relevantMessages: Message[];
   oneMessage: Message[];
   messageObject: Message[];
+  public onlineOffline: boolean = navigator.onLine;
 
   constructor(
     private router: Router,
     private userService: UserService,
     private messageService: MessageService,
     private loadingCtrl: LoadingController
-  ) {}
+  ) {
+    this.loadedUsers = JSON.parse(localStorage.getItem("loadedUsers"));
+    console.log(this.onlineOffline);
+    console.log(this.loadedUsers);
+  }
 
   ngOnInit() {
     this.usersSub = this.userService.users.subscribe(users => {
@@ -40,12 +45,15 @@ export class HomePage {
       this.relevantUser = this.loadedUsers.filter(
         user => user.userId === this.user_ID
       );
+      //localStorage.setItem("loadedUsers", JSON.stringify(this.loadedUsers));
     });
     this.messageSub = this.messageService.messages.subscribe(messages => {
       this.loadedMessages = messages;
       this.relevantMessages = this.loadedMessages.filter(
         message => message.fromUser === this.user_ID || message.toUser === this.user_ID
       );
+      localStorage.setItem("loadedMessages", JSON.stringify(this.loadedMessages));
+      this.loadedMessages = JSON.parse(localStorage.getItem("loadedMessages"));
     });
   }
 
@@ -73,6 +81,7 @@ export class HomePage {
     });
     this.userService.fetchUsers().subscribe(() => {
       this.isLoading = false;
+      localStorage.setItem("loadedUsers", JSON.stringify(this.loadedUsers));
     });
   }
 

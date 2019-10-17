@@ -118,16 +118,6 @@ export class ChatFormPage implements OnInit {
       this.messagesBetweenUsers = this.relevantMessages[0].message;
       this.checkMyEmail = this.relevantMessages[0].fromUserEmail;
     });
-    /*let i;
-    for (i = 0; i < this.loadedMessages.length; i++) {
-        let k;
-        for (k = 0; k < this.loadedMessages[i].message.length; k++) {
-          let decipherText = this.simpleCrypto.decrypt(this.loadedMessages[i].message[k].message);
-          this.loadedMessages[i].message[k].message = decipherText;
-        }
-      }
-    this.messagesBetweenUsers = this.loadedMessages;
-    */
   }
 
   initiateRecording() {
@@ -230,7 +220,7 @@ export class ChatFormPage implements OnInit {
     this.checkMessages = true;
     this.messageService.fetchMessages().subscribe(() => {
       this.isLoading = false;
-      //this.refreshMessages();
+      this.refreshMessages();
     });
     this.userService.fetchUsers().subscribe(() => {
       this.isLoading = false;
@@ -248,8 +238,17 @@ export class ChatFormPage implements OnInit {
     }
     while (this.checkMessages) {
       this.messageService.fetchMessages().subscribe(() => {
-      });
+        });
+      //this.messagesBetweenUsers = this.relevantMessages[0].message;
       await delay(1000);
+    }
+    let i;
+    for (i = 0; i < this.loadedMessages.length; i++) {
+      let k;
+      for (k = 0; k < this.loadedMessages[i].message.length; k++) {
+        let decipherText = this.simpleCrypto.decrypt(this.loadedMessages[i].message[k].message);
+        this.loadedMessages[i].message[k].message = decipherText;
+      }
     }
   }
 
@@ -269,12 +268,13 @@ export class ChatFormPage implements OnInit {
       })
       .then(loadingEl => {
         loadingEl.present();
-        //let plainText = this.form.value.message;
-        //let chiperText = this.simpleCrypto.encrypt(plainText);
+        let plainText = this.form.value.message;
+        let cipherText = this.simpleCrypto.encrypt(plainText);
         this.messageService
           .addMessage(
             this.relevantMessages[0].id,
             this.form.value.message,
+            cipherText,
             '',
             true,
             this.myEmail
