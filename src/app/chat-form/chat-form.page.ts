@@ -62,6 +62,7 @@ export class ChatFormPage implements OnInit {
   //Url of Blob
   public error;
   iCall = 0;
+  public onlineOffline: boolean = navigator.onLine;
 
   constructor(
     private router: Router,
@@ -74,7 +75,10 @@ export class ChatFormPage implements OnInit {
     private storage: AngularFireStorage,
     private iab: InAppBrowser,
     private domSanitizer: DomSanitizer
-    ) { }
+    ) {
+      this.loadedUsers = JSON.parse(localStorage.getItem("loadedUsers"));
+      this.loadedMessages = JSON.parse(localStorage.getItem("loadedMessages"));
+    }
 
     sanitize(url: string) {
       return this.domSanitizer.bypassSecurityTrustUrl(url);
@@ -98,26 +102,47 @@ export class ChatFormPage implements OnInit {
       this.userID = paramMap.get('userID');
       this.isLoading = true;
     });
-    this.usersSub = this.userService.users.subscribe(users => {
-      this.loadedUsers = users;
+    if (this.onlineOffline) {
+      this.usersSub = this.userService.users.subscribe(users => {
+        this.loadedUsers = users;
+        localStorage.setItem("loadedUsers", JSON.stringify(this.loadedUsers));
+        this.getUserID();
+        this.relevantUser = this.loadedUsers.filter(
+          user => user.userId === this.user_ID
+        );
+        this.relevantFriendUser = this.loadedUsers.filter(
+          user => user.userId === this.userID
+        );
+        this.friendName = this.relevantFriendUser[0].email;
+        this.myEmail = this.relevantUser[0].email;
+      });
+      this.messageSub = this.messageService.messages.subscribe(messages => {
+        this.loadedMessages = messages;
+        localStorage.setItem("loadedMessages", JSON.stringify(this.loadedMessages));
+        this.relevantMessages = this.loadedMessages.filter(
+          message => (message.fromUser === this.user_ID && message.toUser === this.userID) || (message.fromUser === this.userID && message.toUser === this.user_ID)
+        );
+        this.messagesBetweenUsers = this.relevantMessages[0].message;
+        this.checkMyEmail = this.relevantMessages[0].fromUserEmail;
+      });
+    } else {
+      this.loadedUsers = JSON.parse(localStorage.getItem("loadedUsers"));
       this.getUserID();
-      this.relevantUser = this.loadedUsers.filter(
-        user => user.userId === this.user_ID
-      );
-      this.relevantFriendUser = this.loadedUsers.filter(
-        user => user.userId === this.userID
-      );
-      this.friendName = this.relevantFriendUser[0].email;
-      this.myEmail = this.relevantUser[0].email;
-    });
-    this.messageSub = this.messageService.messages.subscribe(messages => {
-      this.loadedMessages = messages;
+        this.relevantUser = this.loadedUsers.filter(
+          user => user.userId === this.user_ID
+        );
+        this.relevantFriendUser = this.loadedUsers.filter(
+          user => user.userId === this.userID
+        );
+        this.friendName = this.relevantFriendUser[0].email;
+        this.myEmail = this.relevantUser[0].email;
+      this.loadedMessages = JSON.parse(localStorage.getItem("loadedMessages"));
       this.relevantMessages = this.loadedMessages.filter(
         message => (message.fromUser === this.user_ID && message.toUser === this.userID) || (message.fromUser === this.userID && message.toUser === this.user_ID)
       );
       this.messagesBetweenUsers = this.relevantMessages[0].message;
       this.checkMyEmail = this.relevantMessages[0].fromUserEmail;
-    });
+    }
   }
 
   initiateRecording() {
@@ -216,15 +241,21 @@ export class ChatFormPage implements OnInit {
 }
 
   ionViewWillEnter() {
-    this.isLoading = true;
-    this.checkMessages = true;
-    this.messageService.fetchMessages().subscribe(() => {
+    if (this.onlineOffline) {
+      this.isLoading = true;
+      this.checkMessages = true;
+      this.messageService.fetchMessages().subscribe(() => {
+        this.isLoading = false;
+        this.refreshMessages();
+      });
+      this.userService.fetchUsers().subscribe(() => {
+        this.isLoading = false;
+      });
+    } else {
       this.isLoading = false;
-      this.refreshMessages();
-    });
-    this.userService.fetchUsers().subscribe(() => {
-      this.isLoading = false;
-    });
+      this.loadedUsers = JSON.parse(localStorage.getItem("loadedUsers"));
+      this.loadedMessages = JSON.parse(localStorage.getItem("loadedMessages"));
+    }
   }
 
   downloadFileUrl(url: string) {

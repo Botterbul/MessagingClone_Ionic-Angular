@@ -16,8 +16,8 @@ const routes: Routes = [
     canLoad: [AuthGuard] },
   {
     path: 'chat-form/:userID',
-    loadChildren: './chat-form/chat-form.module#ChatFormPageModule',
-    canLoad: [AuthGuard]},
+    loadChildren: './chat-form/chat-form.module#ChatFormPageModule'
+  },
   {
     path: 'add-friends',
     loadChildren: './add-friends/add-friends.module#AddFriendsPageModule',
