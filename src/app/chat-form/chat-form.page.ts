@@ -253,6 +253,7 @@ export class ChatFormPage implements OnInit {
       });
     } else {
       this.isLoading = false;
+      this.checkMessages = false;
       this.loadedUsers = JSON.parse(localStorage.getItem("loadedUsers"));
       this.loadedMessages = JSON.parse(localStorage.getItem("loadedMessages"));
     }
